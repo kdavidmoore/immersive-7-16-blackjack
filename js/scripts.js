@@ -27,9 +27,9 @@ $(document).ready(function(){
 			playersHand.push(theDeck[2]);
 			placeCard('player', 'two', theDeck[2]);
 			calculateTotal(playersHand,'player');
+			checkWin();
 		}, 3000);
 
-		checkWin();
 	});
 
 	$('.hit-button').click(function(){
