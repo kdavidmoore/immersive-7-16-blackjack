@@ -12,25 +12,31 @@ $(document).ready(function(){
 		console.log(theDeck);
 
 		//Push onto the playersHand array, the new card. Then place it in the DOM.
-		playersHand.push(theDeck[0]);
-		placeCard('player', 'one', theDeck[0]);
-		
-		dealersHand.push(theDeck[1]);
-		placeCard('dealer', 'one', theDeck[1]);
+		setTimeout(function(){
+			playersHand.push(theDeck[0]);
+			placeCard('player', 'one', theDeck[0]);
+		}, 1000);
 
-		playersHand.push(theDeck[2]);
-		placeCard('player', 'two', theDeck[2]);
+		setTimeout(function(){
+			dealersHand.push(theDeck[1]);
+			placeCard('dealer', 'one', theDeck[1]);
+			dealersHand.push(theDeck[3]);
+			// don't display the second card yet
+		}, 2000);
 
-		dealersHand.push(theDeck[3]);
-		placeCard('dealer', 'two', theDeck[3]);
-
-		calculateTotal(playersHand,'player');
-		calculateTotal(dealersHand,'dealer');
-
+		setTimeout(function(){
+			playersHand.push(theDeck[2]);
+			placeCard('player', 'two', theDeck[2]);
+			calculateTotal(playersHand,'player');
+		}, 3000);
 	});
 
 	$('.hit-button').click(function(){
-		
+		if (playersHand.length < 3) {
+			placeCard('dealer', 'two', theDeck[3]);
+			calculateTotal(dealersHand,'dealer');
+		}
+
 		var slotForNewCard = '';
 		if(playersHand.length == 2){slotForNewCard = "three";}
 		else if(playersHand.length == 3){slotForNewCard = "four";}
@@ -40,46 +46,86 @@ $(document).ready(function(){
 		playersHand.push(theDeck[topOfTheDeck]);
 		calculateTotal(playersHand, 'player');
 		topOfTheDeck++;
-
+		checkWin();
 	});
 
 	$('.stand-button').click(function(){
-		//Player clicked on stand. WHat happens to the player? Nothing.
-			var slotForNewCard = "";
-			var dealerTotal = calculateTotal(dealersHand, 'dealer');
-			while(dealerTotal < 17){
-				// Dealer has less than 17. Hit away!
-				if(dealersHand.length == 2){slotForNewCard = "three";}
-				else if(dealersHand.length == 3){slotForNewCard = "four";}
-				else if(dealersHand.length == 4){slotForNewCard = "five";}
-				else if(dealersHand.length == 5){slotForNewCard = "six";}
-				placeCard('dealer',slotForNewCard,theDeck[topOfTheDeck]);
-				dealersHand.push(theDeck[topOfTheDeck]);
-				dealerTotal = calculateTotal(dealersHand, 'dealer');
-				topOfTheDeck++;
-			}
+		//Player clicked on stand. What happens to the player? Nothing.
+		if (playersHand.length < 3) {
+			placeCard('dealer', 'two', theDeck[3]);
+			calculateTotal(dealersHand, 'dealer');
+		}
 
-			// Dealer has at least 17 Check to see who won.
-			checkWin();
+		var slotForNewCard = "";
+		var dealerTotal = calculateTotal(dealersHand, 'dealer');
+		while(dealerTotal < 17){
+			// Dealer has less than 17. Hit away!
+			if(dealersHand.length == 2){slotForNewCard = "three";}
+			else if(dealersHand.length == 3){slotForNewCard = "four";}
+			else if(dealersHand.length == 4){slotForNewCard = "five";}
+			else if(dealersHand.length == 5){slotForNewCard = "six";}
+			placeCard('dealer',slotForNewCard,theDeck[topOfTheDeck]);
+			dealersHand.push(theDeck[topOfTheDeck]);
+			dealerTotal = calculateTotal(dealersHand, 'dealer');
+			topOfTheDeck++;
+		}
+
+		// Dealer has at least 17.
+		// Check to see who won.
+		checkWin();
 	});
 
 });
 
 function checkWin(){
-	alert("Game over");
+	var playerTotal = Number($('.player-total-number').html());
+	var dealerTotal = Number($('.dealer-total-number').html());
+	if (playerTotal > 21 && dealerTotal < 21) {
+		alert("You busted!");
+	} else if (playerTotal < 21 && dealerTotal > 21){
+		alert("The dealer busted!");
+	} else if (playerTotal === 21 && dealerTotal < 21){
+		alert("You beat the dealer to 21!");
+	} else if (playerTotal < 21 && dealerTotal === 21){
+		alert("The dealer beat you to 21!")
+	} else if (playersHand.length > 5){
+		alert("It's a push!");
+	}
 }
 
 function placeCard(who, where, cardToPlace){
 	var classSelector = '.'+who+'-cards .card-'+where;
-
 	// Write logic to fix the 11, 12, 13 issue
+	var i = 0;
+	var cardRank = '';
+	var cardSuit = '';
+	while (i < cardToPlace.length-1 ){
+		cardRank += cardToPlace[i];
+		i++;
+	} while (i < cardToPlace.length){
+		cardSuit += cardToPlace[i];
+		i++;
+	}
+
+	if (parseInt(cardRank) === 11){
+		cardRank = "J";
+		cardToPlace = cardRank + cardSuit;
+		console.log("placing a " + cardToPlace);
+	} else if (parseInt(cardRank) === 12){
+		cardRank = "Q";
+		cardToPlace = cardRank + cardSuit;
+		console.log("placing a " + cardToPlace);
+	} else if (parseInt(cardRank) === 13){
+		cardRank = "K";
+		cardToPlace = cardRank + cardSuit;
+		console.log("placing a " + cardToPlace);
+	}
 
 	$(classSelector).html(cardToPlace);
 }
 
 function createDeck(){
-	// Fill the with 
-	// - 52 cards.
+	// - 52 cards
 	// - 4 suits
 	// 	- h, s, d, c
 	var suits = ['h','s','d','c'];
@@ -110,15 +156,12 @@ function shuffleDeck(){
 }
 
 function calculateTotal(hand, whosTurn){
-	// console.log(hand);
-	// console.log(whosTurn);
+	console.log(hand);
+	console.log(whosTurn);
 	var total = 0;
 	var cardValue = 0;
 	for(var i = 0; i<hand.length; i++){
-		cardValue = Number(hand[i].slice(0,-1))
-		if(cardValue > 10){
-			cardValue = 10;
-		}
+		cardValue = Number(hand[i].slice(0,-1));
 		total += cardValue;
 	}
 
