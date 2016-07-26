@@ -9,7 +9,6 @@ $(document).ready(function(){
 	$('.deal-button').click(function(){
 		createDeck(); //Run a function that creates an array of 1H-13C
 		shuffleDeck(); //Shuffle the deck!
-		console.log(theDeck);
 
 		//Push onto the playersHand array, the new card. Then place it in the DOM.
 		setTimeout(function(){
@@ -29,6 +28,8 @@ $(document).ready(function(){
 			placeCard('player', 'two', theDeck[2]);
 			calculateTotal(playersHand,'player');
 		}, 3000);
+
+		checkWin();
 	});
 
 	$('.hit-button').click(function(){
