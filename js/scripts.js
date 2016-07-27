@@ -115,8 +115,8 @@ function checkWin(){
 			dealersHand = [];
 			topOfTheDeck = 4;
 			$('.card').html('');
-			$('.dealer-total').html('');
-			$('.player-total').html('');
+			$('.dealer-total-number').html('');
+			$('.player-total-number').html('');
 		});
 	}
 }
