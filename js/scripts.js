@@ -83,7 +83,6 @@ $(document).ready(function(){
 		// Check to see who won.
 		checkWin();
 	});
-
 });
 
 function checkWin(){
@@ -91,14 +90,34 @@ function checkWin(){
 	var dealerTotal = Number($('.dealer-total-number').html());
 	if (playerTotal > 21 && dealerTotal < 21) {
 		alert("You busted!");
+		reset();
 	} else if (playerTotal < 21 && dealerTotal > 21){
 		alert("The dealer busted!");
+		reset();
 	} else if (playerTotal === 21 && dealerTotal < 21){
 		alert("You beat the dealer to 21!");
+		reset();
 	} else if (playerTotal < 21 && dealerTotal === 21){
-		alert("The dealer beat you to 21!")
+		alert("The dealer beat you to 21!");
+		reset();
 	} else if (playersHand.length > 5){
 		alert("It's a push!");
+		reset();
+	}
+
+	function reset(){
+		// add reset button
+		$('.message').html('<button class="btn btn-primary">Play Again</button>');
+		$('.message').click(function(){
+			// reset the game
+			theDeck =[];
+			playersHand = [];
+			dealersHand = [];
+			topOfTheDeck = 4;
+			$('.card').html('');
+			$('.dealer-total').html('');
+			$('.player-total').html('');
+		});
 	}
 }
 
